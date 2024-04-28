@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-
+use App\Models\Orders\Detail;
 class Product extends Model
 {
     use HasFactory;
@@ -19,6 +19,6 @@ class Product extends Model
     }
     public function orderDetails(): HasMany
     {
-        return $this->hasMany(Details::class,'product_id');
+        return $this->hasMany(Detail::class,'product_id');
     }
 }   

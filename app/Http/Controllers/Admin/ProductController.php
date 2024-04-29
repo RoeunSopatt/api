@@ -182,4 +182,32 @@ class ProductController extends MainController
         }
 
     }
+
+    public function delete($id = 0){
+
+        // Find record from DB
+        $data = Product::find($id);
+
+        // ===>> Check if data is valide
+        if ($data) { // Yes
+
+            // ===>> Delete Data from DB
+            $data->delete();
+
+            // ===> Success Response Back to Client
+            return response()->json([
+                'status'    => 'ជោគជ័យ',
+                'message'   => 'ទិន្នន័យត្រូវបានលុប',
+            ], Response::HTTP_OK);
+
+        } else { // No
+
+            // ===> Failed Response Back to Client
+            return response()->json([
+                'status'    => 'បរាជ័យ',
+                'message'   => 'ទិន្នន័យមិនត្រឹមត្រូវ',
+            ], Response::HTTP_BAD_REQUEST);
+
+        }
+    }
 }

@@ -1,5 +1,7 @@
 <?php
 use App\Http\Controllers\Admin\DashboardController;
+
+use App\Http\Controllers\Admin\ProductController;
 use Illuminate\Support\Facades\Route;
 
 

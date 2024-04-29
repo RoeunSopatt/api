@@ -96,4 +96,90 @@ class ProductController extends MainController
             'message'   => 'ផលិតផលត្រូវបានបង្កើតដោយជោគជ័យ។'
         ],Response::HTTP_OK);
     }
+
+    public function update(Request $req, $id = 0){
+
+        // ===>> Check validation
+        $this->validate(
+            $req,
+            [
+                'name'              => 'required|max:20',
+                'code'              => 'required|max:20',
+                'unit_price'        => 'required',
+                'type_id'           => 'required|exists:products_type,id'
+            ],
+            [
+                'name.required'         => 'សូមបញ្ចូលឈ្មោះផលិតផល',
+                'name.max'              => 'ឈ្មោះផលិតផលមិនអាចលើសពី២០ខ្ទង់',
+                'unit_price.required'   => 'សូមបញ្ចូលឈ្មោះ unit_price',
+                'code.required'         => 'សូមបញ្ចូលឈ្មោះលេខកូដផលិតផល',
+                'code.max'              => 'សូមបញ្ចូលឈ្មោះលេខកូដផលិតផលមិនអាចលើសពី២០ខ្ទង់',
+                'type_id.exists'        => 'សូមជ្រើសរើសឈ្មោះផលិតផល'
+            ]
+        );
+
+        // ===>> Update Product
+        // Find record from DB
+        $product                    = Product::find($id);
+
+        // ===>> Check if data is valide
+        if ($product) { //Yes
+
+            // Map field of table in DB Vs. requested value from client
+            $product->name          = $req->name;
+            $product->code          = $req->code;
+            $product->type_id       = $req->type_id;
+            $product->unit_price    = $req->unit_price;
+
+            // ===>> Save to DB
+            $product->save();
+
+            // ===>> Image Upload
+            if ($req->image) {
+
+                // Need to create folder before storing images
+                $folder = Carbon::today()->format('d-m-y');
+
+                // ===>> Send to File Service
+                $image  = FileUpload::uploadFile($req->image, 'products/', $req->fileName);
+
+                // ===>> Check if image has been successfully uploaded
+                if ($image['url']) {
+
+                    // Map field of table in DB Vs. uri from File Service
+                    $product->image     = $image['url'];
+
+                    // ===>> Save to DB
+                    $product->save();
+
+                }
+            }
+
+            // Prepare Data backt to Client
+            $product = Product::select('*')
+            ->with([
+                'type'
+            ])
+            ->find($product->id);
+
+            // ===> Success Response Back to Client
+            return response()->json([
+                'status'    => 'ជោគជ័យ',
+                'message'   => 'ផលិតផលត្រូវបានកែប្រែជោគជ័យ',
+                'product'   => $product,
+            ], Response::HTTP_OK);
+
+        } else { // No
+
+            // ===> Failed Response Back to Client
+            return response()->json([
+
+                'status'    => 'បរាជ័យ',
+                'message'   => 'ទិន្នន័យមិនត្រឹមត្រូវ',
+
+            ], Response::HTTP_BAD_REQUEST);
+
+        }
+
+    }
 }

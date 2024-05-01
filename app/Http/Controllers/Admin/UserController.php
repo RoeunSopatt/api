@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\User\Type;
 use App\Services\FileUpload;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -201,6 +202,51 @@ class UserController extends Controller
                 'status'=> 'បរាជ័យ',
                 'message'=> 'ទិន្នន័យដែលផ្ដល់ឲ្យមិនត្រូវ',
             ],Response::HTTP_BAD_REQUEST);
+        }
+    }
+
+    public function changePassword(Request $req, $id = 0){
+
+        // ===>> Check validation
+        $this->validate($req, [
+            'password' => 'required|min:6|max:20',
+            'confirm_password'  => 'required|same:password',
+        ], [
+            'password.required' => 'សូមបញ្ចូលលេខសម្ងាត់',
+            'password.min'      => 'សូមបញ្ចូលលេខសម្ងាត់ធំជាងឬស្មើ៦',
+            'password.max'      => 'សូមបញ្ចូលលេខសម្ងាត់តូចឬស្មើ២០',
+            'confirm_password.required' => 'សូមបញ្ចូលបញ្ជាក់ពាក្យសម្ងាត់',
+            'confirm_password.same'     => 'សូមបញ្ចូលបញ្ជាក់ពាក្យសម្ងាត់ឲ្យដូចលេខសម្ងាត់',
+
+        ]);
+
+        // ===>> Get User from DB
+        $user = User::find($id);
+
+        // ===>> Check if User is Valid
+        if ($user) { // Yes
+
+            // Mapping between database table field and requested data from client
+            $user->password                 = Hash::make($req->password); //Make sure no one can understand it even DB Admin.
+            $user->password_last_updated_at = Carbon::now()->format('Y-m-d H:i:s');
+
+            // Save to DB
+            $user->save();
+
+            // ===>> Success Response Back to Client
+            return response()->json([
+                'message' => 'លេខសម្ងាត់របស់ត្រូវបានកែប្រែ',
+                'user' => $user],
+            Response::HTTP_OK);
+
+        } else { // No
+
+            // ===>> Failed Response Back to Client
+            return response()->json([
+                'status'    => 'បរាជ័យ',
+                'message'   => 'មិនមានទិន្នន័យក្នុងប្រព័ន្ធ',
+            ], Response::HTTP_BAD_REQUEST);
+
         }
     }
 

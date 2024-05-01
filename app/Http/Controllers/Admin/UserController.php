@@ -181,6 +181,27 @@ class UserController extends Controller
             ], Response::HTTP_BAD_REQUEST);
 
         }
+
+        
+    }
+    public function delete($id =0){
+            
+        $data =User::find($id);
+
+        if($data){
+
+            $data->delete();
+            return response()->json([
+                'status'=> 'ជោគជ័យ',
+                'message'=> 'ទិន្នន័យត្រូវបានលុបចេញពីប្រព័ន្ធ',
+
+            ], Response::HTTP_OK);
+        }else{
+            return response()->json([
+                'status'=> 'បរាជ័យ',
+                'message'=> 'ទិន្នន័យដែលផ្ដល់ឲ្យមិនត្រូវ',
+            ],Response::HTTP_BAD_REQUEST);
+        }
     }
 
 }

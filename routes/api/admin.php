@@ -18,5 +18,11 @@ Route::group(['prefix'=> 'products'], function () {
     Route::delete('/{id}',[ProductController::class,'delete']);
     Route::get('/transactions/{id}', [ProductController::class,'getProduct']);
 
+    //product type
+    Route::get('/types', [ProductTypeController::class,'getData']);
+    Route::post('/types',   [ProductTypeController::class, 'create']);
+    Route::post('/types{id}', [ProductTypeController::class,'update']);
+    Route::delete('/types{id}', [ProductTypeController::class,'delete']);
+
     
 });

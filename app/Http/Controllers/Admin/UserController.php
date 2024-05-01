@@ -250,4 +250,36 @@ class UserController extends Controller
         }
     }
 
+    public function block(Request $req, $id = 0){
+
+        // ===>> Get User from DB
+        $user = User::find($id);
+
+         // ===>> Check if User is Valid
+        if ($user) { // Yes
+
+            // Mapping between database table field and turn reverse status
+            $user->is_active  =  !$user->is_active;
+
+            // Save to DB
+            $user->save();
+
+            // ===>> Success Response Back to Client
+            return response()->json([
+                'status'    => 'Success',
+                'message'   => 'User successfully modified',
+                'user'      => $user,
+            ], Response::HTTP_OK);
+
+        } else { // Yes
+
+            // ===>> Failed Response Back to Client
+            return response()->json([
+                'status'    => 'Fail',
+                'message'   => 'Invalid data',
+            ], Response::HTTP_BAD_REQUEST);
+
+        }
+    }
+
 }

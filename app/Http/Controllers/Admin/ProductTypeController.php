@@ -56,4 +56,22 @@ class ProductTypeController extends MainController
         }
 
     }
+
+    public function delete($id= 0){
+        $data =Type::find($id);
+
+        if( $data ){
+            $data->delete();
+            return response()->json([
+                'status'    =>'ជោគជ័យ',
+                'message' => 'data has been deleted!',
+
+            ],Response::HTTP_OK);
+        }else{
+            return response()->json([
+                'status'  => 'បរាជ័យ',
+                'message' => 'ទិន្នន័យមិនត្រឹមត្រូវ',
+            ],Response::HTTP_BAD_REQUEST);
+        }
+    }
 }

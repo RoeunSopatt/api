@@ -95,4 +95,92 @@ class UserController extends Controller
 
         }
     }
+
+    public function update(Request $req, $id = 0){
+
+        // ==>> Check validation
+        $this->validate(
+            $req,
+            [
+                'name'     => 'required',
+                'phone'    => 'required',
+            ],
+            [
+                'name.required'     => 'សូមវាយបញ្ចូលឈ្មោះរបស់អ្នក',
+                'phone.required'    => 'សូមវាយបញ្ចូលលេខទូរស័ព្ទរបស់អ្នក',
+            ]
+        );
+
+        // Unique Phone Number Validation
+        $check  = User::where('id','!=',$id)->where('phone',$req->phone)->first();
+        if($check){ // Yes
+
+            // ===> Failed Response Back to Client
+            return response()->json([
+                'status'    => 'បរាជ័យ',
+                'message'   => 'លេខទូរស័ព្ទនេះត្រូវបានប្រើប្រាស់រួចហើយនៅក្នុងប្រព័ន្ធ',
+            ], Response::HTTP_BAD_REQUEST);
+
+        }
+
+         // Unique Email Validation
+        $check  = User::where('id','!=',$id)->where('email',$req->email)->first();
+        if($check){ // Yes
+
+            // ===> Failed Response Back to Client
+            return response()->json([
+                'status'    => 'បរាជ័យ',
+                'message'   => 'អ៊ីមែលនេះមានក្នុងប្រព័ន្ធរួចហើយ',
+            ], Response::HTTP_BAD_REQUEST);
+
+        }
+
+        //==============================>> Start Updating data
+        // Get Data from DB
+        $user = User::select('id', 'name', 'phone', 'email', 'type_id', 'avatar', 'created_at', 'is_active')->with(['type'])->find($id);
+        if ($user) { // Yes
+
+            // Mapping between database table field and requested data from client
+            $user->name      =   $req->name;
+            $user->type_id   =   $req->type_id;
+            $user->phone     =   $req->phone;
+            $user->email     =   $req->email;
+            $user->is_active =   $req->is_active;
+
+            // Call to File Service
+            if ($req->image) {
+
+                // Call File Service
+                $image     = FileUpload::uploadFile($req->image, 'users', $req->fileName);
+
+                // Only valid url can be used.
+                if ($image['url']) {
+
+                    // Mapping between database table field and uri from File Service
+                    $user->avatar = $image['url'];
+
+                }
+            }
+
+            // ===>> Save to DB
+            $user->save();
+
+            // ===>> Success Response Back to Client
+            return response()->json([
+                'status'    => 'ជោគជ័យ',
+                'message'   => 'ទិន្នន័យត្រូវបានកែប្រែ',
+                'user'      => $user,
+            ], Response::HTTP_OK);
+
+        } else { // No
+
+            // ===>> Failed Response Back to Client
+            return response()->json([
+                'status'    => 'បរាជ័យ',
+                'message'   => 'ទិន្នន័យដែលផ្តល់ឲ្យមិនត្រូវទេ',
+            ], Response::HTTP_BAD_REQUEST);
+
+        }
+    }
+
 }

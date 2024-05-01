@@ -27,3 +27,15 @@ Route::group(['prefix'=> 'products'], function () {
 
     
 });
+Route::group(['prefix'=> 'user'], function () {
+
+    Route:: get('/types', [UserController::class,'getUserType']);
+    Route::get('/', [UserController::class,'getData']);
+    Route::get('/{id}', [UserController::class,'view']);
+    Route::post('/', [UserController::class,'create']);
+    Route::post('/{id}', [UserController::class,'update']);
+    Route::delete('/{id}', [UserController::class,'delete']);
+
+    Route::post('/block/{id}', [UserController::class,'block']);
+    Route::post('/{id}/change-password', [UserController::class,'changePassword']);
+});

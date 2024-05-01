@@ -2,6 +2,7 @@
 use App\Http\Controllers\Admin\DashboardController;
 
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProductTypeController;
 use Illuminate\Support\Facades\Route;
 
 

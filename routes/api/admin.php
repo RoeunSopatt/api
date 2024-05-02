@@ -54,5 +54,5 @@ Route::group(['prefix'=> 'sales'], function () {
     Route::delete('/{id}', [SaleController::class,'delete']);
 });
 Route::group(['prefix'=> 'print'], function () {
-    Route::get('/print/{reciept_number', [PrintController::class,'printfInvioceOrder']);
+    Route::get('/print/{reciept_number}', [PrintController::class,'printfInvioceOrder']);
 });

@@ -2,6 +2,7 @@
 use App\Http\Controllers\Admin\DashboardController;
 
 use App\Http\Controllers\Admin\POSController;
+use App\Http\Controllers\Admin\PrintController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductTypeController;
 use App\Http\Controllers\Admin\SaleController;
@@ -51,4 +52,7 @@ Route::group(['prefix'=> 'pos'], function () {
 Route::group(['prefix'=> 'sales'], function () {
     Route::get('/',            [SaleController::class, 'getData']);
     Route::delete('/{id}', [SaleController::class,'delete']);
+});
+Route::group(['prefix'=> 'print'], function () {
+    Route::get('/print/{reciept_number', [PrintController::class,'printfInvioceOrder']);
 });

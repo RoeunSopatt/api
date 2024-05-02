@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\Admin\DashboardController;
 
+use App\Http\Controllers\Admin\POSController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductTypeController;
 use App\Http\Controllers\Admin\UserController;
@@ -39,4 +40,10 @@ Route::group(['prefix'=> 'user'], function () {
 
     Route::post('/block/{id}', [UserController::class,'block']);
     Route::post('/{id}/change-password', [UserController::class,'changePassword']);
+});
+//====================================>POS
+Route::group(['prefix'=> 'pos'], function () {
+
+    Route::get('/products', [POSController::class,'getProducts']);
+    Route::post('/order', [POSController::class,'makeOrder']);
 });

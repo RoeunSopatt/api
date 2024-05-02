@@ -42,4 +42,20 @@ class SaleController extends Controller
         $data =$data->orderBy('id','desc')->paginate($request->limit ? $request->limit :10);
         return response()->json($data,Response::HTTP_OK);
     }
+    public function delete($id =0){
+        $data =Order::find($id);
+
+        if($data){
+            $data->delete();
+            return response()->json([
+                'status' => 'ជោគជ័យ',
+                'message'=> 'ទិន្នន័យត្រូវបានលុប'
+            ],Response::HTTP_OK);
+        }else{
+            return response()->json([
+                'status'=> 'បរាជ័យ',
+                'message'=> 'ទិន្នន័យមិនត្រឹមត្រូវ'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+    }
 }

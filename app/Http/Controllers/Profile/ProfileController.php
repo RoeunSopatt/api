@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User\User;
 use App\Services\FileUpload;
 use Carbon\Carbon;
+use Hash;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -93,6 +94,61 @@ class ProfileController extends Controller
 
         }
     }
+    public function changePassword(Request $req){
+
+        // ===>>> Data Validation
+       $this->validate(
+           $req,
+           [
+               'old_password'      => 'required|min:6|max:20',
+               'new_password'      => 'required|min:6|max:20',
+               'confirm_password'  => 'required|min:6|max:20|same:new_password',
+           ],
+           [
+               'old_password.required'     => 'សូមបញ្ចូលពាក្យសម្ងាត់',
+               'old_password.min'          => 'ពាក្យសម្ងាត់ចាស់ ត្រូវមាន៦ ខ្ទង់យ៉ាងតិច',
+               'old_password.max'          => 'ពាក្យសម្ងាត់ចាស់ ត្រូវមាន២០ ច្រើនបំផុត',
+
+               'new_password.required'     => 'សូមបញ្ចូលពាក្យសម្ងាត់ថ្មី',
+               'new_password.min'          => 'ពាក្យសម្ងាត់ថ្មី ត្រូវមាន៦ ខ្ទង់យ៉ាងតិច',
+               'new_password.max'          => 'ពាក្យសម្ងាត់ថ្មី ត្រូវមាន២០ ច្រើនបំផុត',
+
+               'confirm_password.same'     => 'សូមបញ្ចាក់ថាពាក្យសម្ងាត់ថ្មី'
+
+           ]
+       );
+
+       // ===>> Get current logged user by token
+       $auth = JWTAuth::parseToken()->authenticate();
+
+       // ===>> Start to update user
+       $user = User::findOrFail($auth->id);
+
+       // ===>> Compare the Old and New Password
+       if (Hash::check($req->old_password, $user->password)) { // Yes
+
+           // ===>> Pair Passowrd Field
+           $user->password = Hash::make($req->password);
+
+           // ===>> Save to DB
+           $user->save();
+
+           // ===>> Success Response Back to Client
+           return response()->json([
+               'status'    => 'success',
+               'message'   => 'លេខសម្ងាត់របស់អ្នកត្រូវបានកែប្រែដោយជោគជ័យ'
+           ], Response::HTTP_OK);
+
+       } else { // No
+
+           // ===>> Failed Response Back to Client
+           return response()->json([
+               'status'    => 'error',
+               'message'   => 'ពាក្យសម្ងាត់ចាស់របស់អ្នកមិនត្រឹមត្រូវ'
+           ], Response::HTTP_BAD_REQUEST);
+
+       }
+   }
 
 
 }

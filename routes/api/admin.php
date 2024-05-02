@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\POSController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductTypeController;
+use App\Http\Controllers\Admin\SaleController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,4 +47,9 @@ Route::group(['prefix'=> 'pos'], function () {
 
     Route::get('/products', [POSController::class,'getProducts']);
     Route::post('/order', [POSController::class,'makeOrder']);
+});
+Route::group(['prefix'=> 'sales'], function () {
+    Route::get('/',            [SaleController::class, 'getData']);
+    Route::delete('/{id}', [SaleController::class,'delete']);
+    Route::get('/print/{reciept_number', [PrintController::class,'printfInvioceOrder']);
 });

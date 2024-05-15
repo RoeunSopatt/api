@@ -2,64 +2,47 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+
+use App\Http\Controllers\MainController;
 use App\Models\Orders\Order;
+use App\Models\Orders\Detail as OrderDetial;
 use App\Models\Products\Product;
-use App\Models\Products\Type;
+use App\Models\Products\Type as ProductType;
 use App\Services\TelegramService;
+use Exception;
 use Illuminate\Http\Request;
-use OrderDetial;
-use ProductType;
+use Illuminate\Http\Response;
+
 use Tymon\JWTAuth\Facades\JWTAuth;
 
-class POSController extends Controller
+class POSController extends MainController
 {
     //
     public function getProducts(){
-        $products = Type::select("id","name")->with([
-            'products:id,name,image,type_id,unit_price'
-        ])->get();
-        return response()->json($products,Response::HTTP_OK);
+
+        // ===>> Get Data from DB (group by Product type from DB)
+        $data = ProductType::select('id', 'name')
+            ->with([
+            'products:id,name,image,type_id,unit_price' // 1:M
+        ])
+        ->get();
+
+        // ===> Success Response Back to Client
+        return response()->json($data, Response::HTTP_OK);
+
     }
 
-    private function _generateRecieptNumber(){
-        $number = rand(1000000, 9999999);
-        $data =Order::where('reciept_number',$number)->first();
 
-        if($data){
-            return $this->_generateRecieptNumber();
-        }
-        return $number;
-    }
-    private function _senNotification($orderData){
-        $htmlMessage ="<b> ការបញ្ជាទិញទទួលបានជោគជ័យ!</b>\n";
-        $htmlMessage ="<b> -លេខវិកយប័ត្រ៖" .$orderData->reciept_number . "\n";
-        $htmlMessage ="<b> -អ្នកគិតលុយ->" .$orderData->cashier->name;
+    // private function _generateRecieptNumber(){
+    //     $number = rand(1000000, 9999999);
+    //     $data =Order::where('reciept_number',$number)->first();
 
-        $productList= '';
-        $totalProducts =0;
-
-        foreach($orderData->details as $detail){
-            $productList .=sprintf(
-                "%-20s | %-15s | %-10s | %s\n",
-                $detail->product->name,
-                $detail->unit_price,
-                $detail->qty,
-                PHP_EOL
-            );
-            $totalProducts += $detail->qty;
-        }
-
-
-        $htmlMessage .= "\n--------------------------------------\n";
-        $htmlMessage .= "ផលិតផល​​​​​​                 | តម្លៃដើម(៛)       |បរិមាណ\n";
-        $htmlMessage .= $productList . "\n";
-        $htmlMessage .= "<b>* សរុបទាំងអស់៖</b> $totalProducts ទំនិញ $orderData->total_price ៛\n";
-        $htmlMessage .= "- កាលបរិច្ឆេទៈ​ ".$orderData->ordered_at;
-
-        TelegramService::sendMessage($htmlMessage);
-    }
-
+    //     if($data){
+    //         return $this->_generateRecieptNumber();
+    //     }
+    //     return $number;
+    // }
+    
     public function makeOrder(Request $req){
 
         // ===>> Check validation
@@ -137,6 +120,57 @@ class POSController extends Controller
             'order'         => $orderData,
             'message'       => 'ការបញ្ជាទិញត្រូវបានបង្កើតដោយជោគជ័យ។'
         ], Response::HTTP_OK);
+
+    }
+    private function _generateReceiptNumber(){
+
+        // ===>> Generate 6 Random Number bigger than 1000000 and smaller than 9999999
+        $number = rand(1000000, 9999999);
+
+        // ===>> Get Data from DB the random number
+        $data  = Order::where('receipt_number', $number)->first();
+
+        // ===>> Check if the number exist in th DB record
+        if ($data) { // Yes exist
+
+            // ===>> Check Again
+            return $this->_generateReceiptNumber();
+        }
+
+        // ===>> Return the unique number back
+        return $number;
+    }
+    private function _sendNotification($orderData){
+
+        // ===>> Prepare Header Format
+        $htmlMessage = "<b>ការបញ្ជាទិញទទួលបានជោគជ័យ!</b>\n";
+        $htmlMessage .= "- លេខវិកយប័ត្រ៖ " . $orderData->receipt_number . "\n";
+        $htmlMessage .= "- អ្នកគិតលុយ៖ " . $orderData->cashier->name;
+
+        $productList    = '';
+        $totalProducts  = 0;
+
+        // ===>> Prepare Detail Format & Find total Price
+        foreach ($orderData->details as $detail) {
+            $productList .= sprintf(
+                "%-20s | %-15s | %-10s | %s\n",
+                $detail->product->name,
+                $detail->unit_price,
+                $detail->qty,
+                PHP_EOL
+            );
+            $totalProducts += $detail->qty;
+        }
+
+        // ===>> Prepare Footer Format
+        $htmlMessage .= "\n---------------------------------------\n";
+        $htmlMessage .= "ផលិតផល             | តម្លៃដើម(៛)     | បរិមាណ\n";
+        $htmlMessage .= $productList . "\n";
+        $htmlMessage .= "<b>* សរុបទាំងអស់៖</b> $totalProducts ទំនិញ $orderData->total_price ៛\n";
+        $htmlMessage .= "- កាលបរិច្ឆេទ: " . $orderData->ordered_at;
+
+        // ===>> Send to Telegram Server
+        TelegramService::sendMessage($htmlMessage);
 
     }
 

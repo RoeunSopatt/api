@@ -3,16 +3,19 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-class OrderDetial extends Migration
+
+return new class extends Migration
 {
     /**
      * Run the migrations.
+     *
+     * @return void
      */
-    public function up(): void
+    public function up()
     {
-        //
-        Schema::table("order_details", function (Blueprint $table) {
-            $table->increments('id',true);
+        Schema::create('order_details', function (Blueprint $table) {
+
+            $table->increments('id', true);
 
             $table->integer('order_id')->index()->unsigned();
             $table->foreign('order_id')->references('id')->on('order')->onDelete('cascade');
@@ -30,11 +33,11 @@ class OrderDetial extends Migration
 
     /**
      * Reverse the migrations.
+     *
+     * @return void
      */
-    public function down(): void
+    public function down()
     {
-        //
         Schema::dropIfExists('order_details');
-
     }
 };

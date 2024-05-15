@@ -10,12 +10,15 @@ class Detail extends Model
 {
     use HasFactory;
     protected $table = 'order_details';
-    public function order()
+
+
+    public function order() //M:1
     {
-        return $this->belongsTo(Order::class,'order_id');
+        return $this->belongsTo(Order::class, 'order_id');
     }
-    public function product()
+
+    public function product() //M:1
     {
-        return $this->belongsTo(Product::class,'product_id'); 
+        return $this->belongsTo(Product::class, 'product_id');
     }
 }

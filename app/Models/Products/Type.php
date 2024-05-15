@@ -10,7 +10,8 @@ class Type extends Model
 {
     use HasFactory;
     protected $table = 'products_type';
-    public function products():HasMany
+
+    public function products(): HasMany //1:M
     {
         return $this->hasMany(Product::class, 'type_id');
     }

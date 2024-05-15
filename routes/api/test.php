@@ -1,6 +1,7 @@
 <?php
 
 
+use App\Services\FileUpload;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Testing\EmailController;
 
@@ -15,4 +16,4 @@ Route::post('/send-email', [EmailController::class, 'sendEmailRaw']);
 
 // ========================================================================>> File Service
 
-
+Route::post('/service/uploadFile', [FileUpload::class, 'uploadFile']);

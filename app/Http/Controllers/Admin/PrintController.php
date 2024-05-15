@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+
+use App\Http\Controllers\MainController;
 use App\Models\Orders\Order;
 use Http;
 use Illuminate\Http\Request;
 
-class PrintController extends Controller
+class PrintController extends MainController
 {
     //
     public $JS_BASE_URL;
@@ -20,7 +21,7 @@ class PrintController extends Controller
         $this->JS_PASSWORD = env('JS_PASSWORD');
         $this->JS_TEMPLATE = env('JS_TEMPLATE');
     }
-    public function printfInvioceOrder($receiptNumber=0){
+    public function printInvioceOrder($receiptNumber=0){
         try {
             //code...
             $url =$this->JS_BASE_URL."/api/report";

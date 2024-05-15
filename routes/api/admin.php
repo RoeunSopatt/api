@@ -26,8 +26,8 @@ Route::group(['prefix'=> 'products'], function () {
     //product type
     Route::get('/types', [ProductTypeController::class,'getData']);
     Route::post('/types',   [ProductTypeController::class, 'create']);
-    Route::post('/types{id}', [ProductTypeController::class,'update']);
-    Route::delete('/types{id}', [ProductTypeController::class,'delete']);
+    Route::post('/types/{id}', [ProductTypeController::class,'update']);
+    Route::delete('/types/{id}', [ProductTypeController::class,'delete']);
 
     
 });
@@ -49,10 +49,16 @@ Route::group(['prefix'=> 'pos'], function () {
     Route::get('/products', [POSController::class,'getProducts']);
     Route::post('/order', [POSController::class,'makeOrder']);
 });
-Route::group(['prefix'=> 'sales'], function () {
-    Route::get('/',            [SaleController::class, 'getData']);
-    Route::delete('/{id}', [SaleController::class,'delete']);
+// ===========================================================================>> Sale
+Route::group(['prefix' => 'sales'], function () {
+
+    Route::get('/',                         [SaleController::class, 'getData']);
+    Route::delete('/{id}',                  [SaleController::class, 'delete']);
+    Route::get('/print/{receipt_number}',   [PrintController::class, 'printInvioceOrder']);
+
 });
+
+
 Route::group(['prefix'=> 'print'], function () {
     Route::get('/print/{reciept_number}', [PrintController::class,'printfInvioceOrder']);
 });

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+
 use App\Http\Controllers\MainController;
 use App\Models\Products\Product;
 use App\Services\FileUpload;
@@ -13,71 +13,104 @@ use Illuminate\Support\Carbon;
 class ProductController extends MainController
 {
     //
-    public function getData(Request $request){
-        
-        //declare variable
-        $data = Product::select('*')->with(['type']);
+    public function getData(Request $req){
 
-        if($request->key && $request->Key != ''){
+        // Declar Variable
+        $data = Product::select('*')
+        ->with(['type'])
+        ;
 
-            $data = $data->where('code', 'LIKE', '%' . $request->Key . '%')->OrWhere('name', 'LIKE', '%' . $request->Key .'%');
+        // ===>> Filter Data
+        // By Key compared with Code or Name
+        if ($req->key && $req->key != '') {
+
+            $data = $data->where('code', 'LIKE', '%' . $req->key . '%')
+            ->Orwhere('name', 'LIKE', '%' . $req->key . '%');
+        }
+
+        // By Product Type
+        if ($req->type && $req->type != 0) {
+
+            $data = $data->where('type_id', $req->type);
 
         }
 
-        if($request->type && $request->type != 0){
+        $data = $data->orderBy('id', 'desc') // Order Data by Giggest ID to small
+        ->paginate($req->limit ? $req->limit : 10,'per_page'); // Paginate Data
 
-            $data = $data->where('type_id', $request->type);
+        // ===> Success Response Back to Client
+        return response()->json($data, Response::HTTP_OK);
+
+    }
+    public function view($id = 0){
+
+        // Find record from DB
+        $data = Product::select('*')->find($id);
+
+        // ===>> Check if data is valide
+        if ($data) { // Yes
+
+            // ===> Success Response Back to Client
+            return response()->json($data, Response::HTTP_OK);
+
+        } else { // No
+
+            // ===> Failed Response Back to Client
+            return response()->json([
+                'status'    => 'បរាជ័យ',
+                'message'   => 'ទិន្នន័យមិនត្រឹមត្រូវ',
+            ], Response::HTTP_BAD_REQUEST);
+
         }
-
-        $data = $data->orderBy('id','desc')->paginate($request->limit ? $request->limit :10,'per_page');
-
-        return response()->json($data,Response::HTTP_OK);
 
     }
 
-    public function createData(Request $request){
 
-        //check validation
+    public function create(Request $req){
+
+        // ===>> Check validation
         $this->validate(
-            $request, 
+            $req,
             [
                 'name'              => 'required|max:50',
                 'code'              => 'required|max:20',
                 'unit_price'        => 'required|numeric',
                 'type_id'           => 'required|exists:products_type,id'
             ],
-
             [
-                'name.required'       =>'សូមបញ្ចូលឈ្មោះផលិតផល',
-                'name.max'            => 'ឈ្មោះផលិតផលមិនអាចលើសពី៥០ខ្ទង់',
+                'name.required'         => 'សូមបញ្ចូលឈ្មោះផលិតផល',
+                'name.max'              => 'ឈ្មោះផលិតផលមិនអាចលើសពី50ខ្ទង់',
 
-                'code.required'       => 'សូមបញ្ចូលឈ្មោះលេខកូដផលិតផល',
+                'code.required'         => 'សូមបញ្ចូលឈ្មោះលេខកូដផលិតផល',
                 'code.max'              => 'សូមបញ្ចូលឈ្មោះលេខកូដផលិតផលមិនអាចលើសពី២០ខ្ទង់',
 
                 'unit_price.required'   => 'សូមបញ្ចូលតម្លៃរាយ',
                 'unit_price.numeric'    => 'សូមបញ្ចូលតម្លៃរាយជាលេខ',
 
                 'type_id.exists'        => 'សូមជ្រើសរើសឈ្មោះផលិតផល អោយបានត្រឹមត្រូវ កុំបោកពេក'
-            ],
 
+            ]
         );
-        $product                =   new Product;
-        $product->name          =   $request->name;
-        $product->code          =   $request->code;
-        $product->type_id       =   $request->type_id;
-        $product->unit_price    =   $request->unit_price;
 
-            // ===>> Save To DB
+        // ===>> Field Mapping Product
+        // Map field of table in DB Vs. requested value from client
+        $product                =   new Product;
+        $product->name          =   $req->name;
+        $product->code          =   $req->code;
+        $product->type_id       =   $req->type_id;
+        $product->unit_price    =   $req->unit_price;
+
+        // ===>> Save To DB
         $product->save();
 
         // ===>> Image Upload
-        if ($request->image) {
+        if ($req->image) {
 
             // Need to create folder before storing images
             $folder = Carbon::today()->format('d-m-y');
 
             // ===>> Send to File Service
-            $image  = FileUpload::uploadFile($request->image, 'products', $request->fileName);
+            $image  = FileUpload::uploadFile($req->image, 'products', $req->fileName);
 
             // ===>> Check if image has been successfully uploaded
             if ($image['url']) {
@@ -90,11 +123,13 @@ class ProductController extends MainController
 
             }
         }
+
         // ===> Success Response Back to Client
         return response()->json([
             'data'      =>  Product::select('*')->with(['type'])->find($product->id),
             'message'   => 'ផលិតផលត្រូវបានបង្កើតដោយជោគជ័យ។'
-        ],Response::HTTP_OK);
+        ], Response::HTTP_OK);
+
     }
 
     public function update(Request $req, $id = 0){

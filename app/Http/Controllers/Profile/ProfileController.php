@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\MainController;
 use App\Models\User\User;
 use App\Services\FileUpload;
 use Carbon\Carbon;
 use Hash;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Http\Response;
 
-class ProfileController extends Controller
+class ProfileController extends MainController
 {
     //
     public function view(){

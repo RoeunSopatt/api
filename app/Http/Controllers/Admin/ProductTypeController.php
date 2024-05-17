@@ -1,13 +1,23 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-use App\Http\Controllers\MainController;
 use App\Models\Products\Type;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Http\Request;            // for getting Payload form client
+use Illuminate\Http\Response; 
+
+
+//=============================================================================>> Core Library
+          // for returning data back to client
+
+//=============================================================================>> Third Party Library
+
+//=============================================================================>> Custom Library
+
+   
+use App\Http\Controllers\MainController;// for getting Type data form database
+
 class ProductTypeController extends MainController
 {
-    //
     public function getData(Request $req)
     {
         // តាង data ជាទិន្នន័យដែលត្រូវរក
@@ -29,77 +39,92 @@ class ProductTypeController extends MainController
         ->get();
 
         // ===>> Return data to client
-        return response()->json([
-            'status'   =>'ជោគជ័យ',
-            'message'   => 'getប្រភេទផលិតផលជោគជ័យ!',
-            'data'  => $data,
-        ],Response::HTTP_OK);;
+        return $data;
     }
 
-    public function createProductType(Request $request){
-
+    public function create(Request $req)
+    {
+        // ===>> Check validation
         $this->validate(
-            $request,[
-                "name"=> "required|max:20",
+            $req,
+            [
+                'name'             => 'required|max:20',
             ],
             [
-                "name.required"=> "សូមបញ្ចូលឈ្មោះម៉ាកផលិតផល",
-                "name.max"=> "ឈ្មោះម៉ាកផលិតផលមិនអាចលើសពី២០ខ្ទង់",
+                'name.required'    => 'សូមបញ្ចូលឈ្មោះម៉ាកផលិតផល',
+                'name.max'         => 'ឈ្មោះម៉ាកផលិតផលមិនអាចលើសពី២០ខ្ទង់',
             ]
         );
 
-        $data =      new Type;
-        $data->name = $request->name;
+        //==============================>> Start Adding data
+        $data           =   new Type;
+        $data->name     =   $req->name;
         $data->save();
+
         return response()->json([
-            'data'  => $data,
-            'message'=>'ទិន្នន័យត្រូវបានបង្កើតដោយជោគជ័យ។'
-        ],Response::HTTP_OK);
+            'data'          => $data,
+            'message'       => 'ទិន្នន័យត្រូវបានបង្កើតដោយជោគជ័យ។'
+        ], Response::HTTP_OK);
     }
-    public function update(Request $request,$id=0){
+
+    public function update(Request $req, $id = 0)
+    {
+        // ===>> Check validation
         $this->validate(
-            $request,[
-                'name'  => 'required|max:20',
+            $req,
+            [
+                'name'             => 'required|max:20',
             ],
             [
-                'name.required'=> 'សូមបញ្ចូលឈ្មោះម៉ាកផលិតផល',
-                'name.max'=> 'ឈ្មោះម៉ាកផលិតផលមិនអាចលើសពី២០ខ្ទង់',
+                'name.required'    => 'សូមបញ្ចូលឈ្មោះម៉ាកផលិតផល',
+                'name.max'         => 'ឈ្មោះម៉ាកផលិតផលមិនអាចលើសពី២០ខ្ទង់',
             ]
         );
-        $data  = Type::find($id);
 
-        if($data){
-            $data->name = $request->name;
+        //==============================>> Start updating data
+        $data           =   Type::find($id);
+
+        if ($data) {
+
+            $data->name     =   $req->name;
             $data->save();
+
             return response()->json([
-                'status'   =>'ជោគជ័យ',
-                'message'   => 'ប្រភេទផលិតផលត្រូវបានកែប្រែជោគជ័យ!',
-                'data'  => $data,
-            ],Response::HTTP_OK);
-        }else{
+                'status'        => 'ជោគជ័យ',
+                'message'       => 'ប្រភេទផលិតផលត្រូវបានកែប្រែជោគជ័យ!',
+                'data'          => $data,
+            ], Response::HTTP_OK);
+
+        }else {
+
             return response()->json([
                 'status'    => 'បរាជ័យ',
-                'message'=> 'ទិន្នន័យមិនត្រឹមត្រូវ',
-            ],Response::HTTP_BAD_REQUEST);
-        }
+                'message'   => 'ទិន្នន័យមិនត្រឹមត្រូវ',
+            ], Response::HTTP_BAD_REQUEST);
 
+        }
     }
 
-    public function delete($id= 0){
-        $data =Type::find($id);
+    public function delete($id)
+    {
+        $data           =   Type::find($id);
 
-        if( $data ){
+        if ($data) {
+
             $data->delete();
-            return response()->json([
-                'status'    =>'ជោគជ័យ',
-                'message' => 'data has been deleted!',
 
-            ],Response::HTTP_OK);
-        }else{
             return response()->json([
-                'status'  => 'បរាជ័យ',
-                'message' => 'ទិន្នន័យមិនត្រឹមត្រូវ',
-            ],Response::HTTP_BAD_REQUEST);
+                'status'        => 'ជោគជ័យ',
+                'message'       => 'data has been deleted!',
+            ], Response::HTTP_OK);
+
+        }else {
+
+            return response()->json([
+                'status'    => 'បរាជ័យ',
+                'message'   => 'ទិន្នន័យមិនត្រឹមត្រូវ',
+            ], Response::HTTP_BAD_REQUEST);
+
         }
     }
 }

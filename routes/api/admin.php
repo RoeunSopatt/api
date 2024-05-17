@@ -1,13 +1,13 @@
 <?php
 use App\Http\Controllers\Admin\DashboardController;
-
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\POSController;
 use App\Http\Controllers\Admin\PrintController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductTypeController;
 use App\Http\Controllers\Admin\SaleController;
 use App\Http\Controllers\Admin\UserController;
-use Illuminate\Support\Facades\Route;
+
 
 
 //=============> Create Route Dashboard<==================//

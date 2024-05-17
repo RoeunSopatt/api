@@ -8,6 +8,30 @@ use Illuminate\Http\Response;
 class ProductTypeController extends MainController
 {
     //
+    public function getData(Request $req)
+    {
+        // តាង data ជាទិន្នន័យដែលត្រូវរក
+        $data = Type::select("id", 'name')
+        // ->with([
+        //     'products:id,Type_id,name,image'
+        // ])
+        ->withCount([
+            'products as n_of_products'
+        ]);
+
+        // ===>> Filter data
+        if ($req->key && $req->key != ''){
+            $data = $data->where('name', 'LIKE', '%'.$req->key.'%'); //search by key
+        }
+
+        // ===>> Get data from DB
+        $data = $data->orderBy('id', 'DESC')
+        ->get();
+
+        // ===>> Return data to client
+        return $data;
+    }
+
     public function create(Request $request){
 
         $this->validate(

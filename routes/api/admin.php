@@ -25,7 +25,7 @@ Route::group(['prefix'=> 'products'], function () {
 
     //product type
     Route::get('/types', [ProductTypeController::class,'getData']);
-    Route::post('/types',   [ProductTypeController::class, 'create']);
+    Route::post('/type',   [ProductTypeController::class, 'createProductType']);
     Route::post('/types/{id}', [ProductTypeController::class,'update']);
     Route::delete('/types/{id}', [ProductTypeController::class,'delete']);
 

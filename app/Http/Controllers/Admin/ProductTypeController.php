@@ -29,10 +29,14 @@ class ProductTypeController extends MainController
         ->get();
 
         // ===>> Return data to client
-        return $data;
+        return response()->json([
+            'status'   =>'ជោគជ័យ',
+            'message'   => 'getប្រភេទផលិតផលជោគជ័យ!',
+            'data'  => $data,
+        ],Response::HTTP_OK);;
     }
 
-    public function create(Request $request){
+    public function createProductType(Request $request){
 
         $this->validate(
             $request,[

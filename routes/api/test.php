@@ -16,4 +16,4 @@ Route::post('/send-email', [EmailController::class, 'sendEmailRaw']);
 
 // ========================================================================>> File Service
 
-Route::post('/set-file/uploadFile', [FileUpload::class, 'uploadFile']);
+Route::post('/services/uploadFile', [FileUpload::class, 'uploadFile']);

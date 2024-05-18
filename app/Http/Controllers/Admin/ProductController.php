@@ -66,9 +66,9 @@ class ProductController extends MainController
     }
 
 
-    public function create(Request $req){
-
-        // ===>> Check validation
+    public function create(Request $req)
+    {
+        // Check validation
         $this->validate(
             $req,
             [
@@ -90,46 +90,34 @@ class ProductController extends MainController
                 'type_id.exists'        => 'សូមជ្រើសរើសឈ្មោះផលិតផល អោយបានត្រឹមត្រូវ កុំបោកពេក'
 
             ]
+
         );
-
-        // ===>> Field Mapping Product
-        // Map field of table in DB Vs. requested value from client
-        $product                =   new Product;
-        $product->name          =   $req->name;
-        $product->code          =   $req->code;
-        $product->type_id       =   $req->type_id;
-        $product->unit_price    =   $req->unit_price;
-
-        // ===>> Save To DB
+        $product                = new Product;
+        $product->name          = $req->name;
+        $product->code          = $req->code;
+        $product->type_id       = $req->type_id;
+        $product->unit_price    = $req->unit_price;
+        
+        //Save the data to DB
         $product->save();
 
-        // ===>> Image Upload
+        //  Upload image
         if ($req->image) {
 
-            // Need to create folder before storing images
+            // Crate folder for image and then stored the image in the folder
             $folder = Carbon::today()->format('d-m-y');
+            $image  = FileUpload::uploadFile($req->image, 'products/' . $folder, $req->fileName);
 
-            // ===>> Send to File Service
-            $image  = FileUpload::uploadFile($req->image, 'products/'.$folder, $req->fileName);
-
-            // ===>> Check if image has been successfully uploaded
-            if ($image['url']) {
-
-                // Map field of table in DB Vs. uri from File Service
-                $product->image     = $image['url'];
-
-                // ===>> Save to DB
-                $product->save();
-
-            }
+            // Save image
+            $product->image  = $image['url'];
+            $product->save();
         }
 
-        // ===> Success Response Back to Client
+        // send response back to clients as json
         return response()->json([
-            'data'      =>  Product::select('*')->with(['type'])->find($product->id),
+            'data'      => Product::select('*')->with(['type'])->find($product->id),
             'message'   => 'ផលិតផលត្រូវបានបង្កើតដោយជោគជ័យ។'
         ], Response::HTTP_OK);
-
     }
 
     public function update(Request $req, $id = 0){

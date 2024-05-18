@@ -34,11 +34,11 @@ class UserSeeder extends Seeder
         $users =  [
             [
                 'type_id'       => 1,
-                'email'         => 'yimklok.kh@gmail.com',
-                'phone'         => '0977779688',
+                'email'         => 'sopatt123.kh@gmail.com',
+                'phone'         => '060486849',
                 'password'      => bcrypt('123456'),
                 'is_active'     => 1,
-                'name'          => 'Yim Klok',
+                'name'          => 'Sopatt Roeun',
                 'avatar'        => 'static/icon/user.png',
                 'created_at'    => Carbon::now()->format('Y-m-d H:i:s'),
                 'updated_at'    =>  Carbon::now()->format('Y-m-d H:i:s')

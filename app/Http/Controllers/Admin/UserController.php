@@ -138,6 +138,7 @@ class UserController extends MainController
 
     }
 
+
     public function update(Request $req, $id = 0){
 
         // ==>> Check validation

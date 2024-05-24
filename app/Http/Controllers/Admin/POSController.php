@@ -170,7 +170,7 @@ class POSController extends MainController
         $htmlMessage .= "- កាលបរិច្ឆេទ: " . $orderData->ordered_at;
 
         // ===>> Send to Telegram Server
-        TelegramService::sendMessage($htmlMessage);
+        TelegramService::sendMessage($htmlMessage,env('TELEGRAM_CHAT_ID'));
 
     }
 

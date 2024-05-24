@@ -27,7 +27,7 @@ class PrintController extends MainController
 
             // URL Preparation
 
-            $url = "https://sopatt123.jsreportonline.net/api/report";
+            $url = $this->JS_BASE_URL."/api/report";
             // Debugging: Log the constructed URL
             info("Constructed URL: $url");
 
@@ -50,7 +50,7 @@ class PrintController extends MainController
             // Prepare Payload for JS Report Service
             $payload = [
                 "template" => [
-                    "name" => 'main',
+                    "name" => $this->JS_TEMPLATE,
                 ],
                 // "data" => [
                 //     'total' => $totalPrice,
@@ -60,7 +60,7 @@ class PrintController extends MainController
             ];
 
             // Send Request to JS Report Service
-            $response = Http::withBasicAuth('dopaminegm@mail.com','Patt2004')
+            $response = Http::withBasicAuth($this->JS_USERNAME, $this->JS_PASSWORD)
                 ->withHeaders([
                     'Content-Type' => 'application/json',
                 ])
